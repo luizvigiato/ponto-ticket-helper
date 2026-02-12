@@ -34,7 +34,11 @@ initializeTheme();
 // Register service worker only in production to avoid cache issues in development.
 if (import.meta.env.PROD && 'serviceWorker' in navigator) {
     window.addEventListener('load', () => {
-        navigator.serviceWorker.register('/sw.js').catch(() => {
+        navigator
+            .serviceWorker.register('/sw.js', {
+                updateViaCache: 'none',
+            })
+            .catch(() => {
             // ignore registration errors
         });
     });
