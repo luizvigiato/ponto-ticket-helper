@@ -1,5 +1,7 @@
 # Controle de Ticket de Ponto
 
+Idioma: **Português (Brasil)** | [English](README.en.md)
+
 Este projeto foi criado para tentar auxiliar minha esposa a organizar a obrigatoriedade do registro de ticket de ponto.
 
 A ideia nasceu porque a empresa ainda não conseguiu garantir que o ponto digital funcione de forma confiável sem a necessidade de salvar uma foto do ticket toda vez que o ponto é batido.
@@ -49,7 +51,3 @@ Lista de melhorias e ideias para lembrar depois:
 - Exibir status de envio (pendente, enviado, erro).
 - Permitir exportar relatórios (PDF/Excel).
 - Criar lembretes para não esquecer de registrar o ponto.
-
----
-
-Se desejar, no próximo passo posso adicionar também o arquivo `LICENSE` (MIT ou GPL-3.0) automaticamente no repositório.
