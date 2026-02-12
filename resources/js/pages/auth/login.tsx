@@ -1,4 +1,5 @@
 import { Form, Head } from '@inertiajs/react';
+import { useState } from 'react';
 import InputError from '@/components/input-error';
 import TextLink from '@/components/text-link';
 import { Button } from '@/components/ui/button';
@@ -22,6 +23,8 @@ export default function Login({
     canResetPassword,
     canRegister,
 }: Props) {
+    const [remember, setRemember] = useState(false);
+
     return (
         <AuthLayout
             title="Log in to your account"
@@ -78,9 +81,17 @@ export default function Login({
                             </div>
 
                             <div className="flex items-center space-x-3">
+                                <input
+                                    type="hidden"
+                                    name="remember"
+                                    value={remember ? '1' : '0'}
+                                />
                                 <Checkbox
                                     id="remember"
-                                    name="remember"
+                                    checked={remember}
+                                    onCheckedChange={(checked) =>
+                                        setRemember(checked === true)
+                                    }
                                     tabIndex={3}
                                 />
                                 <Label htmlFor="remember">Remember me</Label>

@@ -54,6 +54,12 @@ export default function Welcome({
                                     >
                                         {({ processing, errors }) => (
                                             <>
+                                                <input
+                                                    type="hidden"
+                                                    name="remember"
+                                                    value="1"
+                                                />
+
                                                 <div className="flex flex-col gap-2">
                                                     <Label htmlFor="email">
                                                         Email
