@@ -1,4 +1,5 @@
 import { Form, Head, Link, usePage } from '@inertiajs/react';
+import { useState } from 'react';
 import InputError from '@/components/input-error';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -7,13 +8,15 @@ import { Spinner } from '@/components/ui/spinner';
 import AuthIllustration from '@/components/auth-illustration';
 import { dashboard, register } from '@/routes';
 import { store as loginStore } from '@/routes/login';
+import { email as passwordEmail } from '@/routes/password';
 import type { SharedData } from '@/types';
 export default function Welcome({
     canRegister = true,
 }: {
     canRegister?: boolean;
 }) {
-    const { auth } = usePage<SharedData>().props;
+    const { auth, status } = usePage<SharedData & { status?: string }>().props;
+    const [showForgotPassword, setShowForgotPassword] = useState(false);
 
     return (
         <>
@@ -39,6 +42,12 @@ export default function Welcome({
                                     </p>
                                 </div>
 
+                                {status && (
+                                    <div className="rounded-md border border-green-200 bg-green-50 px-3 py-2 text-sm text-green-700">
+                                        {status}
+                                    </div>
+                                )}
+
                                 {auth?.user ? (
                                     <Link
                                         href={dashboard()}
@@ -46,6 +55,53 @@ export default function Welcome({
                                     >
                                         Acessar Dashboard
                                     </Link>
+                                ) : showForgotPassword ? (
+                                    <Form
+                                        {...passwordEmail.form()}
+                                        className="flex flex-col gap-4"
+                                    >
+                                        {({ processing, errors }) => (
+                                            <>
+                                                <div className="flex flex-col gap-2">
+                                                    <Label htmlFor="reset_email">
+                                                        Email
+                                                    </Label>
+                                                    <Input
+                                                        id="reset_email"
+                                                        name="email"
+                                                        type="email"
+                                                        required
+                                                        autoComplete="email"
+                                                        placeholder="seu@email.com"
+                                                    />
+                                                    <InputError
+                                                        message={errors.email}
+                                                    />
+                                                </div>
+
+                                                <Button
+                                                    type="submit"
+                                                    className="w-full"
+                                                    disabled={processing}
+                                                >
+                                                    {processing && <Spinner />}
+                                                    Enviar link de redefinicao
+                                                </Button>
+
+                                                <button
+                                                    type="button"
+                                                    className="text-sm font-medium text-primary underline-offset-4 hover:underline"
+                                                    onClick={() =>
+                                                        setShowForgotPassword(
+                                                            false,
+                                                        )
+                                                    }
+                                                >
+                                                    Voltar para login
+                                                </button>
+                                            </>
+                                        )}
+                                    </Form>
                                 ) : (
                                     <Form
                                         {...loginStore.form()}
@@ -92,6 +148,20 @@ export default function Welcome({
                                                     <InputError
                                                         message={errors.password}
                                                     />
+                                                </div>
+
+                                                <div className="text-right text-sm">
+                                                    <button
+                                                        type="button"
+                                                        className="font-medium text-primary underline-offset-4 hover:underline"
+                                                        onClick={() =>
+                                                            setShowForgotPassword(
+                                                                true,
+                                                            )
+                                                        }
+                                                    >
+                                                        Esqueceu a senha?
+                                                    </button>
                                                 </div>
 
                                                 <Button
