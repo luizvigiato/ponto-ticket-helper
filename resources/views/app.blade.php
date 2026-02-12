@@ -35,8 +35,8 @@
         <link rel="icon" href="/favicon.ico" sizes="any">
         <link rel="icon" href="/favicon.svg" type="image/svg+xml">
         <link rel="apple-touch-icon" href="/apple-touch-icon.png">
-        <link rel="manifest" href="/manifest.webmanifest">
-        <meta name="theme-color" content="#1d4ed8">
+        <link rel="manifest" href="/manifest.webmanifest?v=0.0.2">
+        <meta name="theme-color" content="#000000">
         <meta name="apple-mobile-web-app-capable" content="yes">
         <meta name="apple-mobile-web-app-status-bar-style" content="default">
 
