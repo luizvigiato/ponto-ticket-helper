@@ -31,8 +31,8 @@ createInertiaApp({
 // This will set light / dark mode on load...
 initializeTheme();
 
-// Register service worker for PWA (manual)
-if ('serviceWorker' in navigator) {
+// Register service worker only in production to avoid cache issues in development.
+if (import.meta.env.PROD && 'serviceWorker' in navigator) {
     window.addEventListener('load', () => {
         navigator.serviceWorker.register('/sw.js').catch(() => {
             // ignore registration errors
