@@ -17,7 +17,7 @@ class StoreTimeTicketRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'image' => ['required', 'file', 'image', 'max:5120'],
+            'image' => ['required', 'file', 'image', 'max:20480'],
             'taken_at' => ['nullable', 'date'],
         ];
     }

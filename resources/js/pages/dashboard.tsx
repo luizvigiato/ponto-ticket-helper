@@ -32,11 +32,12 @@ function formatDate(value: string) {
 
 export default function Dashboard({ timeTickets }: PageProps) {
     const [selected, setSelected] = useState<TimeTicket | null>(null);
+    const [editingTicketId, setEditingTicketId] = useState<number | null>(null);
+    const [editingDateValue, setEditingDateValue] = useState('');
     const orderedTickets = useMemo(
         () => [...(timeTickets ?? [])].sort((a, b) => +new Date(b.taken_at) - +new Date(a.taken_at)),
         [timeTickets],
     );
-    const [editingDate, setEditingDate] = useState<string | null>(null);
     const ticketImageUrl = (path: string) => `/storage/${path}`;
 
     return (
@@ -70,7 +71,16 @@ export default function Dashboard({ timeTickets }: PageProps) {
                     ) : (
                         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
                             {orderedTickets.map((ticket) => (
-                                <Dialog key={ticket.id} onOpenChange={(open) => !open && setSelected(null)}>
+                                <Dialog
+                                    key={ticket.id}
+                                    onOpenChange={(open) => {
+                                        if (!open) {
+                                            setSelected(null);
+                                            setEditingTicketId(null);
+                                            setEditingDateValue('');
+                                        }
+                                    }}
+                                >
                                     <DialogTrigger asChild>
                                         <button
                                             onClick={() => setSelected(ticket)}
@@ -105,31 +115,56 @@ export default function Dashboard({ timeTickets }: PageProps) {
                                             />
                                         </div>
                                         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-                                            <form
-                                                method="post"
-                                                action={updateTicket({ timeTicket: ticket.id }).url}
-                                                className="flex flex-wrap items-center gap-2"
-                                            >
-                                                <input type="hidden" name="_method" value="PATCH" />
-                                                <label className="text-sm text-muted-foreground">
-                                                    Data/hora:
-                                                </label>
-                                                <input
-                                                    type="datetime-local"
-                                                    name="taken_at"
-                                                    defaultValue={ticket.taken_at.slice(0, 16)}
-                                                    onChange={(e) => setEditingDate(e.target.value)}
-                                                    className="rounded border px-2 py-1 text-sm shadow-sm"
-                                                />
+                                            {editingTicketId === ticket.id ? (
+                                                <form
+                                                    method="post"
+                                                    action={updateTicket({ timeTicket: ticket.id }).url}
+                                                    className="flex flex-wrap items-center gap-2"
+                                                >
+                                                    <input type="hidden" name="_method" value="PATCH" />
+                                                    <label className="text-sm text-muted-foreground">
+                                                        Data/hora:
+                                                    </label>
+                                                    <input
+                                                        type="datetime-local"
+                                                        name="taken_at"
+                                                        value={editingDateValue}
+                                                        onChange={(e) => setEditingDateValue(e.target.value)}
+                                                        className="rounded border px-2 py-1 text-sm shadow-sm"
+                                                    />
+                                                    <Button
+                                                        type="submit"
+                                                        size="sm"
+                                                        variant="secondary"
+                                                        disabled={!editingDateValue || editingDateValue === ticket.taken_at.slice(0, 16)}
+                                                    >
+                                                        Atualizar
+                                                    </Button>
+                                                    <Button
+                                                        type="button"
+                                                        size="sm"
+                                                        variant="ghost"
+                                                        onClick={() => {
+                                                            setEditingTicketId(null);
+                                                            setEditingDateValue('');
+                                                        }}
+                                                    >
+                                                        Cancelar
+                                                    </Button>
+                                                </form>
+                                            ) : (
                                                 <Button
-                                                    type="submit"
+                                                    type="button"
                                                     size="sm"
                                                     variant="secondary"
-                                                    disabled={!editingDate}
+                                                    onClick={() => {
+                                                        setEditingTicketId(ticket.id);
+                                                        setEditingDateValue(ticket.taken_at.slice(0, 16));
+                                                    }}
                                                 >
-                                                    Atualizar
+                                                    Alterar data/hora
                                                 </Button>
-                                            </form>
+                                            )}
                                             <Button asChild variant="outline" className="gap-2">
                                                 <a href={downloadTicket({ timeTicket: ticket.id }).url} download>
                                                     <Download className="h-4 w-4" />

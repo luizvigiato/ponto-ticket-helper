@@ -92,7 +92,6 @@ export default function TimeTicketCreate() {
                                     name="image"
                                     type="file"
                                     accept="image/*"
-                                    capture="environment"
                                     required
                                     onChange={(event) => {
                                         const file =
@@ -106,8 +105,8 @@ export default function TimeTicketCreate() {
                                     }}
                                 />
                                 <p className="text-sm text-muted-foreground">
-                                    Use a câmera (recomendado) ou selecione uma
-                                    foto existente. Máx. 5 MB.
+                                    Você pode tirar uma foto ou selecionar da
+                                    galeria. Máx. 16 MB.
                                 </p>
                                 <InputError message={errors.image} />
                             </div>
