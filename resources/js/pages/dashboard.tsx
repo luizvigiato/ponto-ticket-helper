@@ -1,9 +1,10 @@
-import { Head, Link, useForm } from '@inertiajs/react';
+import { Head, Link, router, useForm } from '@inertiajs/react';
 import { Camera, Download, Maximize2 } from 'lucide-react';
 import AppLayout from '@/layouts/app-layout';
 import { dashboard } from '@/routes';
 import {
     create as timeTicketsCreate,
+    show as showTicket,
     download as downloadTicket,
     store as timeTicketsStore,
     update as updateTicket,
@@ -89,6 +90,7 @@ function toComparableTimestamp(value: string): number {
 export default function Dashboard({ timeTickets }: PageProps) {
     const [editingTicketId, setEditingTicketId] = useState<number | null>(null);
     const [initialEditDateValue, setInitialEditDateValue] = useState('');
+    const [isUploading, setIsUploading] = useState(false);
     const galleryInputRef = useRef<HTMLInputElement | null>(null);
     const cameraInputRef = useRef<HTMLInputElement | null>(null);
 
@@ -103,19 +105,6 @@ export default function Dashboard({ timeTickets }: PageProps) {
     );
 
     const {
-        setData: setUploadData,
-        post,
-        reset: resetUpload,
-        processing: isUploading,
-    } = useForm<{
-        image: File | null;
-        taken_at: string;
-    }>({
-        image: null,
-        taken_at: '',
-    });
-
-    const {
         data: editData,
         setData: setEditData,
         patch: patchEdit,
@@ -128,7 +117,8 @@ export default function Dashboard({ timeTickets }: PageProps) {
         taken_at: '',
     });
 
-    const ticketImageUrl = (path: string) => `/storage/${path}`;
+    const ticketImageUrl = (ticketId: number) =>
+        showTicket({ timeTicket: ticketId }).url;
 
     const openGalleryUpload = () => {
         galleryInputRef.current?.click();
@@ -142,18 +132,27 @@ export default function Dashboard({ timeTickets }: PageProps) {
         const file = event.target.files?.[0] ?? null;
         if (!file) return;
 
-        setUploadData({
+        setIsUploading(true);
+
+        router.post(timeTicketsStore.url(), {
             image: file,
             taken_at: formatDateTimeLocal(new Date()),
-        });
-
-        post(timeTicketsStore.url(), {
+        }, {
             forceFormData: true,
             preserveScroll: true,
             onSuccess: () => {
-                resetUpload();
                 if (galleryInputRef.current) galleryInputRef.current.value = '';
                 if (cameraInputRef.current) cameraInputRef.current.value = '';
+                setIsUploading(false);
+            },
+            onError: () => {
+                setIsUploading(false);
+                window.alert(
+                    'Nao foi possivel salvar a foto. Tente novamente ou use a tela completa.',
+                );
+            },
+            onFinish: () => {
+                setIsUploading(false);
             },
         });
     };
@@ -258,7 +257,7 @@ export default function Dashboard({ timeTickets }: PageProps) {
                                             <div className="aspect-video w-full bg-neutral-900/5 dark:bg-neutral-100/5">
                                                 <img
                                                     src={ticketImageUrl(
-                                                        ticket.path,
+                                                        ticket.id,
                                                     )}
                                                     alt={
                                                         ticket.original_name ??
@@ -292,7 +291,7 @@ export default function Dashboard({ timeTickets }: PageProps) {
 
                                         <div className="max-h-[70vh] overflow-auto rounded-lg border">
                                             <img
-                                                src={ticketImageUrl(ticket.path)}
+                                                src={ticketImageUrl(ticket.id)}
                                                 alt={
                                                     ticket.original_name ??
                                                     'Ticket'

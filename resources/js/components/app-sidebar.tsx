@@ -43,7 +43,7 @@ const footerNavItems: NavItem[] = [
     },
     {
         title: 'Developer',
-        href: '#',
+        href: 'https://github.com/luizvigiato',
         icon: Cpu,
     }
 ];
