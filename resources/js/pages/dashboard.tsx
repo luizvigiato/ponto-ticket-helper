@@ -4,7 +4,6 @@ import AppLayout from '@/layouts/app-layout';
 import { dashboard } from '@/routes';
 import {
     create as timeTicketsCreate,
-    show as showTicket,
     download as downloadTicket,
     store as timeTicketsStore,
     update as updateTicket,
@@ -117,8 +116,7 @@ export default function Dashboard({ timeTickets }: PageProps) {
         taken_at: '',
     });
 
-    const ticketImageUrl = (ticketId: number) =>
-        showTicket({ timeTicket: ticketId }).url;
+    const ticketImageUrl = (path: string) => `/storage/${path}`;
 
     const openGalleryUpload = () => {
         galleryInputRef.current?.click();
@@ -257,7 +255,7 @@ export default function Dashboard({ timeTickets }: PageProps) {
                                             <div className="aspect-video w-full bg-neutral-900/5 dark:bg-neutral-100/5">
                                                 <img
                                                     src={ticketImageUrl(
-                                                        ticket.id,
+                                                        ticket.path,
                                                     )}
                                                     alt={
                                                         ticket.original_name ??
@@ -291,7 +289,7 @@ export default function Dashboard({ timeTickets }: PageProps) {
 
                                         <div className="max-h-[70vh] overflow-auto rounded-lg border">
                                             <img
-                                                src={ticketImageUrl(ticket.id)}
+                                                src={ticketImageUrl(ticket.path)}
                                                 alt={
                                                     ticket.original_name ??
                                                     'Ticket'
