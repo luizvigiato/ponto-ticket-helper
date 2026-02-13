@@ -22,9 +22,13 @@ Route::get('dashboard', function (Request $request) {
             ->map(fn ($ticket) => [
                 'id' => $ticket->id,
                 'path' => $ticket->path,
-                'taken_at' => $ticket->taken_at,
+                'taken_at' => optional($ticket->taken_at)
+                    ?->timezone(config('app.timezone'))
+                    ->format('Y-m-d H:i:s'),
                 'original_name' => $ticket->original_name,
-                'created_at' => $ticket->created_at,
+                'created_at' => optional($ticket->created_at)
+                    ?->timezone(config('app.timezone'))
+                    ->format('Y-m-d H:i:s'),
             ])
         : [];
 
