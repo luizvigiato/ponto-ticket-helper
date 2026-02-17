@@ -38,8 +38,34 @@ if (import.meta.env.PROD && 'serviceWorker' in navigator) {
             .serviceWorker.register('/sw.js', {
                 updateViaCache: 'none',
             })
+            .then((registration) => {
+                if (registration.waiting) {
+                    registration.waiting.postMessage({ type: 'SKIP_WAITING' });
+                }
+
+                registration.addEventListener('updatefound', () => {
+                    const installing = registration.installing;
+                    if (!installing) return;
+
+                    installing.addEventListener('statechange', () => {
+                        if (
+                            installing.state === 'installed' &&
+                            navigator.serviceWorker.controller
+                        ) {
+                            installing.postMessage({ type: 'SKIP_WAITING' });
+                        }
+                    });
+                });
+
+                let hasRefreshed = false;
+                navigator.serviceWorker.addEventListener('controllerchange', () => {
+                    if (hasRefreshed) return;
+                    hasRefreshed = true;
+                    window.location.reload();
+                });
+            })
             .catch(() => {
-            // ignore registration errors
-        });
+                // ignore registration errors
+            });
     });
 }
