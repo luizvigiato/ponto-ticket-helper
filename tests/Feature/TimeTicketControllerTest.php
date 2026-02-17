@@ -135,25 +135,39 @@ test('show and download return 404 for missing file', function () {
         ->assertNotFound();
 });
 
-test('dashboard shows last 20 tickets ordered by taken at desc', function () {
+test('dashboard filters by start and end dates ordered by taken at desc', function () {
     $user = User::factory()->create();
 
     foreach (range(1, 25) as $index) {
+        $day = $index <= 12 ? 10 : 20;
+        $minute = str_pad((string) $index, 2, '0', STR_PAD_LEFT);
         TimeTicket::query()->create([
             'user_id' => $user->id,
             'path' => 'time-tickets/'.$user->id."/ticket-{$index}.jpg",
             'original_name' => "ticket-{$index}.jpg",
-            'taken_at' => now()->subMinutes($index),
+            'taken_at' => "2026-02-{$day} 10:{$minute}:00",
         ]);
     }
+    TimeTicket::query()->create([
+        'user_id' => $user->id,
+        'path' => 'time-tickets/'.$user->id.'/old-ticket.jpg',
+        'original_name' => 'old-ticket.jpg',
+        'taken_at' => '2026-01-15 10:00:00',
+    ]);
 
     $this->actingAs($user)
-        ->get(route('dashboard'))
+        ->get(route('dashboard', [
+            'start_date' => '2026-02-11',
+            'end_date' => '2026-02-21',
+        ]))
         ->assertOk()
         ->assertInertia(fn (Assert $page) => $page
             ->component('dashboard')
-            ->has('timeTickets', 20)
-            ->where('timeTickets.0.original_name', 'ticket-1.jpg')
-            ->where('timeTickets.19.original_name', 'ticket-20.jpg')
+            ->has('timeTickets', 13)
+            ->where('timeTickets.0.original_name', 'ticket-25.jpg')
+            ->where('timeTickets.12.original_name', 'ticket-13.jpg')
+            ->where('filters.start_date', '2026-02-11')
+            ->where('filters.end_date', '2026-02-21')
+            ->where('showMonthFallbackNotice', false)
         );
 });

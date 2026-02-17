@@ -64,6 +64,9 @@
         ],
         "test": [
             "@php artisan config:clear --ansi",
+            "@php artisan route:clear --ansi",
+            "@php artisan view:clear --ansi",
+            "@php artisan cache:clear --ansi",
             "@test:lint",
             "@php artisan test"
         ],

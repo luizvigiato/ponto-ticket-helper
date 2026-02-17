@@ -8,7 +8,7 @@ import {
     store as timeTicketsStore,
     update as updateTicket,
 } from '@/routes/time-tickets';
-import { type ChangeEvent, useMemo, useRef, useState } from 'react';
+import { type ChangeEvent, useEffect, useMemo, useRef, useState } from 'react';
 import {
     Dialog,
     DialogContent,
@@ -30,6 +30,11 @@ const breadcrumbs: BreadcrumbItem[] = [
 
 type PageProps = {
     timeTickets: TimeTicket[];
+    filters: {
+        start_date: string;
+        end_date: string;
+    };
+    showMonthFallbackNotice: boolean;
 };
 
 function formatDate(value: string) {
@@ -86,12 +91,27 @@ function toComparableTimestamp(value: string): number {
     ).getTime();
 }
 
-export default function Dashboard({ timeTickets }: PageProps) {
+export default function Dashboard({
+    timeTickets,
+    filters,
+    showMonthFallbackNotice,
+}: PageProps) {
     const [editingTicketId, setEditingTicketId] = useState<number | null>(null);
     const [initialEditDateValue, setInitialEditDateValue] = useState('');
     const [isUploading, setIsUploading] = useState(false);
+    const [isFilterOpen, setIsFilterOpen] = useState(
+        Boolean(filters.start_date || filters.end_date),
+    );
+    const [startDateFilter, setStartDateFilter] = useState(filters.start_date);
+    const [endDateFilter, setEndDateFilter] = useState(filters.end_date);
     const galleryInputRef = useRef<HTMLInputElement | null>(null);
     const cameraInputRef = useRef<HTMLInputElement | null>(null);
+
+    useEffect(() => {
+        setStartDateFilter(filters.start_date);
+        setEndDateFilter(filters.end_date);
+        setIsFilterOpen(Boolean(filters.start_date || filters.end_date));
+    }, [filters.end_date, filters.start_date]);
 
     const orderedTickets = useMemo(
         () =>
@@ -167,6 +187,35 @@ export default function Dashboard({ timeTickets }: PageProps) {
         });
     };
 
+    const applyFilters = () => {
+        router.get(
+            dashboard().url,
+            {
+                start_date: startDateFilter || undefined,
+                end_date: endDateFilter || undefined,
+            },
+            {
+                preserveState: true,
+                preserveScroll: true,
+                replace: true,
+            },
+        );
+        setIsFilterOpen(false);
+    };
+
+    const clearFilters = () => {
+        router.get(
+            dashboard().url,
+            {},
+            {
+                preserveState: true,
+                preserveScroll: true,
+                replace: true,
+            },
+        );
+        setIsFilterOpen(false);
+    };
+
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Dashboard" />
@@ -216,13 +265,80 @@ export default function Dashboard({ timeTickets }: PageProps) {
 
                 <div className="space-y-3">
                     <div className="flex items-center justify-between">
-                        <h2 className="text-base font-semibold">
-                            Últimas capturas
-                        </h2>
-                        <p className="text-sm text-muted-foreground">
-                            Ordenado por data do registro
-                        </p>
+                        <h2 className="text-base font-semibold">Capturas</h2>
+                        <div className="flex items-center gap-2">
+                            <p className="hidden text-sm text-muted-foreground sm:block">
+                                Filtro por intervalo de datas
+                            </p>
+                            <Button
+                                type="button"
+                                variant="outline"
+                                size="sm"
+                                onClick={() => setIsFilterOpen(!isFilterOpen)}
+                            >
+                                {isFilterOpen
+                                    ? 'Ocultar filtros'
+                                    : 'Mostrar filtros'}
+                            </Button>
+                        </div>
                     </div>
+
+                    <Card className={isFilterOpen ? 'block' : 'hidden'}>
+                        <CardContent className="pt-6">
+                            <div className="flex flex-col gap-3 md:flex-row md:items-end">
+                                <div className="grid gap-1">
+                                    <label
+                                        htmlFor="filter-start-date"
+                                        className="text-sm font-medium"
+                                    >
+                                        Data inicial
+                                    </label>
+                                    <input
+                                        id="filter-start-date"
+                                        type="date"
+                                        value={startDateFilter}
+                                        onChange={(event) =>
+                                            setStartDateFilter(
+                                                event.target.value,
+                                            )
+                                        }
+                                        className="h-10 rounded-md border bg-background px-3 text-sm"
+                                    />
+                                </div>
+
+                                <div className="grid gap-1">
+                                    <label
+                                        htmlFor="filter-end-date"
+                                        className="text-sm font-medium"
+                                    >
+                                        Data final
+                                    </label>
+                                    <input
+                                        id="filter-end-date"
+                                        type="date"
+                                        value={endDateFilter}
+                                        onChange={(event) =>
+                                            setEndDateFilter(
+                                                event.target.value,
+                                            )
+                                        }
+                                        className="h-10 rounded-md border bg-background px-3 text-sm"
+                                    />
+                                </div>
+
+                                <Button type="button" onClick={applyFilters}>
+                                    Aplicar filtro
+                                </Button>
+                                <Button
+                                    type="button"
+                                    variant="outline"
+                                    onClick={clearFilters}
+                                >
+                                    Limpar
+                                </Button>
+                            </div>
+                        </CardContent>
+                    </Card>
 
                     {orderedTickets.length === 0 ? (
                         <Card className="border-dashed">
@@ -232,8 +348,9 @@ export default function Dashboard({ timeTickets }: PageProps) {
                                 </CardTitle>
                             </CardHeader>
                             <CardContent className="text-sm text-muted-foreground">
-                                Use “Tirar foto” ou “Escolher da galeria” para
-                                enviar a primeira captura.
+                                {showMonthFallbackNotice
+                                    ? 'Voce nao perdeu as fotos, estamos exibindo apenas o mes atual por padrao, use o filtro para consultar fotos antigas.'
+                                    : 'Use “Tirar foto” ou “Escolher da galeria” para enviar a primeira captura.'}
                             </CardContent>
                         </Card>
                     ) : (
