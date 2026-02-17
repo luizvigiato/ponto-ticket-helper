@@ -69,7 +69,7 @@ class TimeTicketController extends Controller
     {
         $this->assertOwner($request, $timeTicket);
 
-        if (! Storage::disk('public')->exists($timeTicket->path)) {
+        if (!Storage::disk('public')->exists($timeTicket->path)) {
             abort(404);
         }
 
@@ -89,7 +89,7 @@ class TimeTicketController extends Controller
     {
         $this->assertOwner($request, $timeTicket);
 
-        if (! Storage::disk('public')->exists($timeTicket->path)) {
+        if (!Storage::disk('public')->exists($timeTicket->path)) {
             abort(404);
         }
 

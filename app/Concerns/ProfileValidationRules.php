@@ -61,7 +61,7 @@ trait ProfileValidationRules
             'required',
             'string',
             'size:11',
-            new ValidCpf(),
+            new ValidCpf,
             $userId === null
                 ? Rule::unique(User::class, 'cpf')
                 : Rule::unique(User::class, 'cpf')->ignore($userId),

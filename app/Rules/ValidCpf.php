@@ -9,10 +9,6 @@ class ValidCpf implements ValidationRule
 {
     /**
      * Validate a CPF number (numbers only or formatted).
-     *
-     * @param  string  $attribute
-     * @param  mixed  $value
-     * @param  \Closure(string): \Illuminate\Translation\PotentiallyTranslatedString  $fail
      */
     public function validate(string $attribute, mixed $value, Closure $fail): void
     {
@@ -29,7 +25,7 @@ class ValidCpf implements ValidationRule
             return;
         }
 
-        if (! $this->hasValidDigits($cpf)) {
+        if (!$this->hasValidDigits($cpf)) {
             $fail('O CPF informado é inválido.');
         }
     }
