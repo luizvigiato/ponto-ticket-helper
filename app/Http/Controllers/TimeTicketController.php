@@ -5,9 +5,9 @@ namespace App\Http\Controllers;
 use App\Http\Requests\TimeTicket\StoreTimeTicketRequest;
 use App\Http\Requests\TimeTicket\UpdateTimeTicketRequest;
 use App\Models\TimeTicket;
+use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
@@ -69,7 +69,7 @@ class TimeTicketController extends Controller
     {
         $this->assertOwner($request, $timeTicket);
 
-        if (!Storage::disk('public')->exists($timeTicket->path)) {
+        if (! Storage::disk('public')->exists($timeTicket->path)) {
             abort(404);
         }
 
@@ -89,7 +89,7 @@ class TimeTicketController extends Controller
     {
         $this->assertOwner($request, $timeTicket);
 
-        if (!Storage::disk('public')->exists($timeTicket->path)) {
+        if (! Storage::disk('public')->exists($timeTicket->path)) {
             abort(404);
         }
 

@@ -6,6 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Spinner } from '@/components/ui/spinner';
 import AuthIllustration from '@/components/auth-illustration';
+import { formatCpf } from '@/lib/utils';
 import { home } from '@/routes';
 import { store } from '@/routes/register';
 
@@ -82,6 +83,13 @@ export default function Register() {
                                                 inputMode="numeric"
                                                 maxLength={14}
                                                 placeholder="000.000.000-00"
+                                                onInput={(event) => {
+                                                    event.currentTarget.value =
+                                                        formatCpf(
+                                                            event.currentTarget
+                                                                .value,
+                                                        );
+                                                }}
                                             />
                                             <InputError message={errors.cpf} />
                                         </div>

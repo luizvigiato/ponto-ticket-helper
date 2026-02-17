@@ -18,11 +18,12 @@ test('authenticated user can access time ticket create page', function () {
 test('user can store a time ticket image', function () {
     Storage::fake('public');
     $user = User::factory()->create();
+    $imageContent = base64_decode('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO5nQ1cAAAAASUVORK5CYII=');
 
     $response = $this->actingAs($user)
         ->from(route('time-tickets.create'))
         ->post(route('time-tickets.store'), [
-            'image' => UploadedFile::fake()->image('ponto.jpg'),
+            'image' => UploadedFile::fake()->createWithContent('ponto.png', $imageContent),
             'taken_at' => '2026-02-10 08:30:00',
         ]);
 
@@ -32,7 +33,7 @@ test('user can store a time ticket image', function () {
     $ticket = TimeTicket::query()->where('user_id', $user->id)->first();
 
     expect($ticket)->not->toBeNull();
-    expect($ticket->original_name)->toBe('ponto.jpg');
+    expect($ticket->original_name)->toBe('ponto.png');
     expect($ticket->taken_at?->format('Y-m-d H:i:s'))->toBe('2026-02-10 08:30:00');
 
     Storage::disk('public')->assertExists($ticket->path);

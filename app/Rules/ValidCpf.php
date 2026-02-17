@@ -16,16 +16,18 @@ class ValidCpf implements ValidationRule
 
         if ($cpf === null || strlen($cpf) !== 11) {
             $fail('O CPF informado é inválido.');
+
             return;
         }
 
         // Reject repeated digits (e.g., 00000000000)
         if (preg_match('/^(\\d)\\1{10}$/', $cpf)) {
             $fail('O CPF informado é inválido.');
+
             return;
         }
 
-        if (!$this->hasValidDigits($cpf)) {
+        if (! $this->hasValidDigits($cpf)) {
             $fail('O CPF informado é inválido.');
         }
     }

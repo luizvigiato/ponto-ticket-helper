@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import AppLayout from '@/layouts/app-layout';
+import { formatCpf } from '@/lib/utils';
 import SettingsLayout from '@/layouts/settings/layout';
 import { edit } from '@/routes/profile';
 import { send } from '@/routes/verification';
@@ -98,13 +99,19 @@ export default function Profile({
                                         id="cpf"
                                         type="text"
                                         className="mt-1 block w-full"
-                                        defaultValue={auth.user.cpf as string}
+                                        defaultValue={formatCpf(auth.user.cpf as string)}
                                         name="cpf"
                                         required
                                         autoComplete="off"
                                         inputMode="numeric"
                                         maxLength={14}
                                         placeholder="000.000.000-00"
+                                        onInput={(event) => {
+                                            event.currentTarget.value =
+                                                formatCpf(
+                                                    event.currentTarget.value,
+                                                );
+                                        }}
                                     />
 
                                     <InputError

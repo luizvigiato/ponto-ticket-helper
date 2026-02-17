@@ -5,10 +5,10 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\RateLimiter;
 use Laravel\Fortify\Features;
 
-test('login screen can be rendered', function () {
+test('login route redirects to home', function () {
     $response = $this->get(route('login'));
 
-    $response->assertOk();
+    $response->assertRedirect(route('home'));
 });
 
 test('users can authenticate using the login screen', function () {
