@@ -100,7 +100,7 @@ class TimeTicketController extends Controller
 
     protected function assertOwner(Request $request, TimeTicket $timeTicket): void
     {
-        if ($request->user()->id !== $timeTicket->user_id) {
+        if ((int) $request->user()->id !== (int) $timeTicket->user_id) {
             throw new HttpResponseException(response()->json(['message' => 'Not Found.'], 404));
         }
     }
